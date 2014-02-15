@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+
+    <title>Visualization: Age of Presidents</title>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="./datafilePresidents.js" charset="utf-8"></script>
+
+    <body>
+	<div id="tc" style="background-color: #333333;">
+
+	</div>
+	<script>
+
+		canWidth = 800;
+		barHeight = 25;
+		canHeight = dt.length * barHeight;
+		//console.log(canWidth);
+		//console.log(canHeight);
+		var xScale = d3.scale.linear()
+            .domain([0, d3.max(dt, function (d) { return(d.death); })])
+            .rangeRound([0, canWidth]);
+		var yScale = d3.scale.linear().domain([0, dt.length])
+            .range([0, dt.length*barHeight]);
+        var col = d3.scale.category20b();
+        var col2 = function(d) { 
+            console.log(d);
+            if(d.search("\\(D\\)")>-1) { return("#5162E0"); } 
+            else if(d.search("\\(W\\)")>-1) { return("#038A05"); }
+            else if(d.search("\\(R\\)")>-1) { return("#ED2121"); }
+            else if(d.search("\\(F\\)")>-1) { return("#48913C"); }
+            else if(d.search("\\(DR\\)")>-1) { return("#C451B7"); }
+            else if(d.search("\\(U\\)")>-1) { return("#C4B449"); }
+            else { return("#ff0000"); } }
+		var canvas = d3.select("#tc").append("svg:svg")
+            .attr("width", canWidth)
+            .attr("height", canHeight);
+		dt2 = dt;
+		canvas.selectAll("rect").data(dt).enter().append("svg:g")
+            .append("svg:rect")
+            .attr("x", 0)
+            .attr("y", function(d,i) { return(yScale(i)); })
+			.attr("height", barHeight)
+            .attr("width", function(d) { return(xScale(d.start)); })
+            .attr("stroke", "white");
+    	canvas.selectAll("g").data(dt).append("svg:text")
+            .text(function (d) { return(d.name); })
+            .attr("x", 5)
+            .attr("y", function(d,i) { return(yScale(i+1)-4); })
+            .style("fill", function(d,i) { return(col2(d.name)); })
+            .style("font-family", "sans-serif")
+            .style("font-size", "8pt")
+            .style("font-weight", "bold")
+            .style("margin", 0);
+		canvas.selectAll("g").data(dt).append("svg:rect")
+            .attr("x", function(d) { return(xScale(d.start)); })
+			.attr("y", function(d,i) { return(yScale(i)); })
+            .attr("height", barHeight)
+            .attr("width", function(d) { return(xScale(d.end-d.start)); })
+			.style("fill", function(d,i) { return(col2(d.name)); })
+            .attr("stroke", "white");
+		canvas.selectAll("g").data(dt).append("svg:rect")
+            .attr("x", function(d) { return(xScale(d.end)); })
+			.attr("y", function(d,i) { return(yScale(i)); })
+            .attr("height", barHeight)
+            .attr("width", function(d) { return(xScale(d.death-d.end)); })
+			.style("fill", "black")
+            .attr("stroke", "white");
+        canvas.selectAll("g").data(dt).append("svg:text")
+            .attr("x", function(d) { return(xScale(d.start))+3; })
+            .attr("y", function(d,i) { return(yScale(i+1)-6); })
+            .attr("height", barHeight)
+            .style("font-family", "sans-serif")
+            .style("font-size", "8pt")
+            .style("font-weight", "bold")
+            .style("margin", 0)
+            .text(function(d) { return(d.start); });
+</script>
+
+</body>
